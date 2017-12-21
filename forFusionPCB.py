@@ -73,7 +73,8 @@ def convert() :
 
   #DRILL OUTPUT
   # Options
-  excellon_writer.SetFormat(True, EXCELLON_WRITER.DECIMAL_FORMAT, 3, 3)
+
+  excellon_writer.SetFormat(True, EXCELLON_WRITER.SUPPRESS_LEADING, 3, 3)
   excellon_writer.SetOptions(False, False, wxPoint(0, 0), False)
   excellon_writer.CreateDrillandMapFilesSet(pcb_dirpath, True, False)
   # Export, Rename
@@ -98,6 +99,5 @@ def convert() :
     zip_f.write(drill_filepath, drill_filename)
 
   print "success"
-
 
 convert()
