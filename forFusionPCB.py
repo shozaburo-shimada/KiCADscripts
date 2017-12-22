@@ -73,10 +73,17 @@ def convert() :
 
   #DRILL OUTPUT
   # Options
+  d_units = True # True: Millimeters, False: inches
+  d_zerosformats = EXCELLON_WRITER.SUPPRESS_LEADING
+  d_mirror = False
+  d_minheader = False
+  d_origin = board.GetAuxOrigin()
+  d_merge_th = True
 
-  excellon_writer.SetFormat(True, EXCELLON_WRITER.SUPPRESS_LEADING, 3, 3)
-  excellon_writer.SetOptions(False, False, wxPoint(0, 0), False)
+  excellon_writer.SetFormat(d_units, d_zerosformats, 3, 3)
+  excellon_writer.SetOptions(d_mirror, d_minheader, d_origin, d_merge_th)
   excellon_writer.CreateDrillandMapFilesSet(pcb_dirpath, True, False)
+
   # Export, Rename
   drill_raw_filepath = os.path.join(pcb_dirpath, "{}.drl".format(board_basename))
   drill_filepath = os.path.join(pcb_dirpath, "{}.TXT".format(board_basename))
