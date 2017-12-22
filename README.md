@@ -7,3 +7,5 @@ Python scripts for KiCAD
 - Click "Tools" -> "Scripting Console" in Pcbnew
 - Input " execfile('\<folder pass\>/\<file name\>.py') " in Console
   
+# Reference
+- http://ci.kicad-pcb.org/job/kicad-doxygen/ws/build/pcbnew/doxygen-python/html/index.html
