@@ -117,7 +117,7 @@ def convert() :
   drill_raw_filepath = os.path.join(pcb_dirpath, "{}.drl".format(board_basename))
   drill_filepath = os.path.join(pcb_dirpath, "{}.TXT".format(board_basename))
   print "drill_filepath:", drill_filepath
-  shutil.move(drill_raw_filepath, drill_filepath)
+  shutil.copyfile(drill_raw_filepath, drill_filepath)
 
   #Build ZIP
   todaydetail = datetime.datetime.today()

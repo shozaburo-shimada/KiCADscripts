@@ -69,8 +69,16 @@ for module in ledList:
     else:
         module.Flip(module.GetPosition())
 
+#Referenceの一括表示非表示
+def visibleref(moduleList, visibility):
+    for module in moduleList:
+        module.Reference().SetVisible(visibility)
+
 #配置する
 arrangeInMatrix(ledList, (115.25, 106.25), (2.5, 2.5), 9, VERTICAL_THEN_HORIZON)
 
 #角度を揃える
 rotate(ledList, 45)
+
+#Refの一括非表示
+visibleref(ledList, False)
