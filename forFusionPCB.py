@@ -11,6 +11,7 @@
 import os
 import shutil
 import zipfile
+import datetime
 
 from pcbnew import *
 
@@ -24,6 +25,11 @@ layers = {
   "GML":Edge_Cuts,
 }
 
+metalmasks = {
+  "GTP":F_Paste,
+  "GBP":B_Paste,
+}
+
 def convert() :
   board = GetBoard()
   plot_controller = PLOT_CONTROLLER(board)
@@ -31,13 +37,20 @@ def convert() :
   excellon_writer = EXCELLON_WRITER(board)
 
   board_basename = os.path.basename(board.GetFileName()).split('.')[0]
-  pcb_dirname = "{}_switchsience_pcb".format(board_basename)
+  gerber_dirname = "gerber"
+  pcb_dirname = "{}_fusionPCB".format(board_basename)
+  output_dirname = os.path.join(gerber_dirname, pcb_dirname)
+  print "cur dir:", os.environ.get("KIPRJMOD")
+  abs_dirpath = os.path.join(os.environ.get("KIPRJMOD"), output_dirname)
+  if not os.path.exists(abs_dirpath):
+        os.makedirs(abs_dirpath)
+
   print "board_basename:", board_basename
   print "pcb_dirname:", pcb_dirname
 
   #GERBER OUTPUT
   # Options
-  plot_options.SetOutputDirectory(pcb_dirname)
+  plot_options.SetOutputDirectory(output_dirname)
   plot_options.SetFormat(PLOT_FORMAT_GERBER)
 
   plot_options.SetPlotFrameRef(False)             #Plot sheet reference on all layers
@@ -65,11 +78,27 @@ def convert() :
 
     pcb_dirpath = plot_controller.GetPlotDirName()
     gerber_raw_filepath = plot_controller.GetPlotFileName()
+    print "gerber_raw_filepath:", gerber_raw_filepath
     gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
     print "gerber_filepath:", gerber_filepath
 
     plot_controller.ClosePlot()
     shutil.move(gerber_raw_filepath, gerber_filepath)
+
+  # Metal Mask Export
+  for (ext, sym) in metalmasks.items() :
+     plot_controller.SetLayer(sym)
+     plot_controller.OpenPlotfile(ext, PLOT_FORMAT_GERBER, "")
+     plot_controller.PlotLayer()
+
+     pcb_dirpath = plot_controller.GetPlotDirName()
+     gerber_raw_filepath = plot_controller.GetPlotFileName()
+     print "gerber_raw_filepath:", gerber_raw_filepath
+     gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
+     print "gerber_filepath:", gerber_filepath
+
+     plot_controller.ClosePlot()
+     shutil.move(gerber_raw_filepath, gerber_filepath)
 
   #DRILL OUTPUT
   # Options
@@ -91,18 +120,20 @@ def convert() :
   shutil.move(drill_raw_filepath, drill_filepath)
 
   #Build ZIP
-  pcb_zipfilepath = "{}.zip".format(pcb_dirpath[:-1])
+  todaydetail = datetime.datetime.today()
+  pcb_zipfilepath = "{}_{}.zip".format(pcb_dirpath[:-1],todaydetail.strftime("_%Y%m%d%H%M"))
   print "pcb_zipfilepath:", pcb_zipfilepath
+
   with zipfile.ZipFile(pcb_zipfilepath, 'w') as zip_f :
     #GERBER
     for (ext, sym) in layers.items() :
       gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
-      gerber_filename = os.path.join(pcb_dirname, "{}.{}".format(board_basename, ext))
+      gerber_filename = "{}.{}".format(board_basename, ext)
       zip_f.write(gerber_filepath, gerber_filename)
 
     #DRILL
     drill_filepath = os.path.join(pcb_dirpath, "{}.TXT".format(board_basename))
-    drill_filename = os.path.join(pcb_dirname, "{}.TXT".format(board_basename))
+    drill_filename = "{}.TXT".format(board_basename)
     zip_f.write(drill_filepath, drill_filename)
 
   print "success"
