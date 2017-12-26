@@ -105,7 +105,7 @@ def convert() :
   d_units = True # True: Millimeters, False: inches
   d_zerosformats = EXCELLON_WRITER.SUPPRESS_LEADING
   d_mirror = False
-  d_minheader = False
+  d_minheader = True
   d_origin = board.GetAuxOrigin()
   d_merge_th = True
 
