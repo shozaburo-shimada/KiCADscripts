@@ -38,19 +38,11 @@ def convert() :
 
   board_basename = os.path.basename(board.GetFileName()).split('.')[0]
   gerber_dirname = "gerber"
-  pcb_dirname = "{}_fusionPCB".format(board_basename)
-  output_dirname = os.path.join(gerber_dirname, pcb_dirname)
-  print "cur dir:", os.environ.get("KIPRJMOD")
-  abs_dirpath = os.path.join(os.environ.get("KIPRJMOD"), output_dirname)
-  if not os.path.exists(abs_dirpath):
-        os.makedirs(abs_dirpath)
-
-  print "board_basename:", board_basename
-  print "pcb_dirname:", pcb_dirname
+  pcbvendor = "fusionPCB"
 
   #GERBER OUTPUT
   # Options
-  plot_options.SetOutputDirectory(output_dirname)
+  plot_options.SetOutputDirectory(gerber_dirname)
   plot_options.SetFormat(PLOT_FORMAT_GERBER)
 
   plot_options.SetPlotFrameRef(False)             #Plot sheet reference on all layers
@@ -77,6 +69,7 @@ def convert() :
     plot_controller.PlotLayer()
 
     pcb_dirpath = plot_controller.GetPlotDirName()
+    print "pcb_dirpath:", pcb_dirpath
     gerber_raw_filepath = plot_controller.GetPlotFileName()
     print "gerber_raw_filepath:", gerber_raw_filepath
     gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
@@ -121,7 +114,9 @@ def convert() :
 
   #Build ZIP
   todaydetail = datetime.datetime.today()
-  pcb_zipfilepath = "{}_{}.zip".format(pcb_dirpath[:-1],todaydetail.strftime("_%Y%m%d%H%M"))
+  #pcb_zipfilepath = "{}_{}.zip".format(pcb_dirpath[:-1],todaydetail.strftime("_%Y%m%d%H%M"))
+  pcb_zipfilename = "{}_{}_{}.zip".format(board_basename, pcbvendor, todaydetail.strftime("%Y%m%d%H%M"))
+  pcb_zipfilepath = "{}{}".format(pcb_dirpath, pcb_zipfilename)
   print "pcb_zipfilepath:", pcb_zipfilepath
 
   with zipfile.ZipFile(pcb_zipfilepath, 'w') as zip_f :
