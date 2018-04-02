@@ -50,7 +50,7 @@ def convert() :
   plot_options.SetPlotValue(False)                #Plot footprint values
   plot_options.SetPlotReference(True)             #Plot footprint references
   plot_options.SetPlotInvisibleText(False)        #Force plotting of invisible values/references
-  plot_options.SetPlotViaOnMaskLayer(False)       #True:w/ resist, False: Do not tent vias(w/o resist)
+  plot_options.SetPlotViaOnMaskLayer(True)        #False:w/ resist, True: Do not tent vias(w/o resist)
   plot_options.SetExcludeEdgeLayer(True)          #Exclude PCB edge layer form other layers
   plot_options.SetUseAuxOrigin(True)              #Use auxiliary axis as origin
 
