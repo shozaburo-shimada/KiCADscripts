@@ -39,7 +39,7 @@ def convert() :
 
   board_basename = os.path.basename(board.GetFileName()).split('.')[0]
   gerber_dirname = "gerber"
-  pcbvendor = "fusionPCB"
+  pcbvendor = "PbanCom"
 
   #GERBER OUTPUT
   # Options
@@ -59,7 +59,7 @@ def convert() :
 
   # Gerber Options
   plot_options.SetUseGerberProtelExtensions(True) #Use Protel file extensions
-  plot_options.SetUseGerberAttributes(False)      #Include extended attributes
+  plot_options.SetUseGerberAttributes(True)      #Include extended attributes
   plot_options.SetSubtractMaskFromSilk(True)     #Subtract soldermask from silkscreen
 
   plot_options.SetGerberPrecision(6)              #Resolution of coordinates in Gerber files (6: 4.6 (unit mm))
@@ -69,31 +69,36 @@ def convert() :
     plot_controller.SetLayer(sym)
     plot_controller.OpenPlotfile(ext, PLOT_FORMAT_GERBER, "")
     plot_controller.PlotLayer()
+    plot_controller.ClosePlot()
 
     pcb_dirpath = plot_controller.GetPlotDirName()
+    """
     print "pcb_dirpath:", pcb_dirpath
     gerber_raw_filepath = plot_controller.GetPlotFileName()
     print "gerber_raw_filepath:", gerber_raw_filepath
     gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
     print "gerber_filepath:", gerber_filepath
 
-    plot_controller.ClosePlot()
-    shutil.move(gerber_raw_filepath, gerber_filepath)
+    # Rename
+    #shutil.move(gerber_raw_filepath, gerber_filepath)
+    """
 
   # Metal Mask Export
   for (ext, sym) in metalmasks.items() :
      plot_controller.SetLayer(sym)
      plot_controller.OpenPlotfile(ext, PLOT_FORMAT_GERBER, "")
      plot_controller.PlotLayer()
+     plot_controller.ClosePlot()
 
+     """
      pcb_dirpath = plot_controller.GetPlotDirName()
      gerber_raw_filepath = plot_controller.GetPlotFileName()
      print "gerber_raw_filepath:", gerber_raw_filepath
      gerber_filepath = os.path.join(pcb_dirpath, "{}.{}".format(board_basename, ext))
      print "gerber_filepath:", gerber_filepath
-
-     plot_controller.ClosePlot()
+     # Rename
      shutil.move(gerber_raw_filepath, gerber_filepath)
+     """
 
   #DRILL OUTPUT
   # Options
@@ -106,19 +111,28 @@ def convert() :
   d_gen_dril = True # Generate Drill File
   d_gen_map = True  # Generate Map File
   d_gen_rpt = True  # Generate Report File
-  d_fn_rpt = plot_controller.GetPlotDirName() + 'drill_report.rpt'
+  # Map File Format:
+  # PLOT_FORMAT_HPGL, PLOT_FORMAT_POST, PLOT_FORMAT_GERBER, PLOT_FORMAT_DXF, PLOT_FORMAT_SVG, PLOT_FORMAT_PDF
+  d_format = PLOT_FORMAT_GERBER
+  d_fn_rpt = plot_controller.GetPlotDirName() + 'drill_report.rpt' #File Name of report
 
   excellon_writer.SetFormat(d_units, d_zerosformats, 3, 3)
   excellon_writer.SetOptions(d_mirror, d_minheader, d_origin, d_merge_th)
+  excellon_writer.SetMapFileFormat(d_format)
   excellon_writer.CreateDrillandMapFilesSet(pcb_dirpath, d_gen_dril, d_gen_map)
   excellon_writer.GenDrillReportFile(d_fn_rpt)
 
+  print "success"
+
+"""
   # Export, Rename
   drill_raw_filepath = os.path.join(pcb_dirpath, "{}.drl".format(board_basename))
   drill_filepath = os.path.join(pcb_dirpath, "{}.TXT".format(board_basename))
   print "drill_filepath:", drill_filepath
   shutil.copyfile(drill_raw_filepath, drill_filepath)
+"""
 
+"""
   #Build ZIP
   todaydetail = datetime.datetime.today()
   #pcb_zipfilepath = "{}_{}.zip".format(pcb_dirpath[:-1],todaydetail.strftime("_%Y%m%d%H%M"))
@@ -134,10 +148,10 @@ def convert() :
       zip_f.write(gerber_filepath, gerber_filename)
 
     #DRILL
-    drill_filepath = os.path.join(pcb_dirpath, "{}.TXT".format(board_basename))
-    drill_filename = "{}.TXT".format(board_basename)
+    drill_filepath = os.path.join(pcb_dirpath, "{}.drl".format(board_basename))
+    drill_filename = "{}.drl".format(board_basename)
     zip_f.write(drill_filepath, drill_filename)
+"""
 
-  print "success"
 
 convert()
