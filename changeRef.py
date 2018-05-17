@@ -24,4 +24,4 @@ for x in c:
         k = i + '{:d}'.format(j + st_ref)
         print ref, "->", k
         ## remove next comment and run!
-        ##x.SetReference(k)
+        x.SetReference(k)
