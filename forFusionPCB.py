@@ -28,6 +28,8 @@ layers = {
 metalmasks = {
   "GTP":F_Paste,
   "GBP":B_Paste,
+  "GL2":In1_Cu,
+  "GL3":In2_Cu,
 }
 
 def convert() :
